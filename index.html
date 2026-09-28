@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalkCare - 보호자 언어지원 앱</title>
+  <!-- Google Fonts: Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #FF7E5F;
+      --primary-light: #FFF0ED;
+      --primary-gradient: linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%);
+      --secondary: #4CAF50;
+      --secondary-light: #E8F5E9;
+      --bg-cream: #FFFDF9;
+      --card-bg: #FFFFFF;
+      --text-main: #2C3E50;
+      --text-sub: #6C7A89;
+      --text-muted: #95A5A6;
+      --border-color: #F0EAE1;
+      --shadow-sm: 0 4px 12px rgba(255, 126, 95, 0.08);
+      --shadow-md: 0 8px 24px rgba(44, 62, 80, 0.08);
+      --shadow-lg: 0 12px 32px rgba(255, 126, 95, 0.15);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-pill: 50px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #F4F1EA;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container App Layout */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-cream);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .app-header {
+      background-color: var(--card-bg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--primary-gradient);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+    }
+
+    .logo-title {
+      font-size: 20px;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .user-badge {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 126, 95, 0.2);
+    }
+
+    /* Main Scroll Area */
+    .app-content {
+      flex: 1;
+      padding-bottom: 90px; /* Space for bottom nav */
+      overflow-y: auto;
+    }
+
+    /* Section Views */
+    .tab-view {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Banners & Cards */
+    .banner {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 20px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .banner::after {
+      content: '💬';
+      position: absolute;
+      right: 15px;
+      bottom: -10px;
+      font-size: 80px;
+      opacity: 0.15;
+      transform: rotate(-15deg);
+    }
+
+    .banner-sub {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .banner-title {
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    /* Card Component */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Today's Goal Card */
+    .goal-card {
+      border-left: 5px solid var(--primary);
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFF9F7 100%);
+    }
+
+    .goal-tag {
+      display: inline-block;
+      background-color: rgba(255, 126, 95, 0.12);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .goal-text {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .target-words-box {
+      background-color: #FFF5F2;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .target-words-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .word-chip {
+      background: white;
+      color: var(--text-main);
+      border: 1px solid rgba(255, 126, 95, 0.3);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Search Bar */
+    .search-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--border-color);
+      background-color: var(--card-bg);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--text-sub);
+    }
+
+    /* Section Title */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Activity Item Card */
+    .activity-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .activity-card:active {
+      transform: scale(0.98);
+    }
+
+    .activity-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background-color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .activity-info {
+      flex: 1;
+    }
+
+    .activity-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .mini-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background-color: var(--primary-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .activity-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .activity-desc {
+      font-size: 13px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+
+    .arrow-icon {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    /* Filter Chips */
+    .filter-group {
+      margin-bottom: 16px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .chip-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .chip-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      white-space: nowrap;
+      padding: 8px 14px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.25);
+    }
+
+    /* Parent Edu Cards */
+    .edu-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .edu-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .edu-badge {
+      background-color: #FFF3E0;
+      color: #E65100;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .edu-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .comparison-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comp-item {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .comp-item.bad {
+      background-color: #FFEBEE;
+      border-left: 4px solid #EF5350;
+      color: #C62828;
+    }
+
+    .comp-item.good {
+      background-color: #E8F5E9;
+      border-left: 4px solid #66BB6A;
+      color: #2E7D32;
+    }
+
+    .comp-label {
+      font-weight: 800;
+      margin-right: 6px;
+    }
+
+    .comp-explain {
+      font-size: 12.5px;
+      color: var(--text-sub);
+      margin-top: 6px;
+      line-height: 1.4;
+      background-color: #F8F9FA;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    /* Report Screen Styles */
+    .weekly-tracker {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .day-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .day-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .day-status {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #F0F0F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #BDC3C7;
+      transition: all 0.3s;
+    }
+
+    .day-status.done {
+      background-color: var(--secondary-light);
+      color: var(--secondary);
+      border: 1.5px solid var(--secondary);
+      font-weight: 700;
+    }
+
+    .stat-box {
+      background-color: var(--primary-light);
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .stat-desc {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .utterance-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .utterance-item {
+      background-color: #F8F9FA;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--primary);
+    }
+
+    .utterance-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .utterance-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .utterance-note {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .disclaimer-box {
+      text-align: center;
+      padding: 16px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      background-color: rgba(0,0,0,0.02);
+      border-radius: var(--radius-sm);
+      margin-top: 20px;
+    }
+
+    /* Modal Component */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      background-color: var(--bg-cream);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      overflow-y: auto;
+      padding: 24px 20px 30px 20px;
+      animation: slideUp 0.3s ease-out;
+      position: relative;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #EFEFEF;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+    }
+
+    .modal-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      background-color: var(--primary-light);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      padding-right: 40px;
+    }
+
+    .detail-section {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .detail-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .script-box {
+      background-color: #FFF9F7;
+      border-left: 4px solid var(--primary);
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .expansion-box {
+      background-color: #E8F5E9;
+      border-left: 4px solid #4CAF50;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .tip-box {
+      background-color: #FFF8E1;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: #F57F17;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: var(--radius-pill);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:active {
+      opacity: 0.9;
+    }
+
+    /* Reaction Form Styles */
+    .reaction-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .reaction-btn {
+      flex: 1;
+      padding: 14px 8px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      transition: all 0.2s;
+    }
+
+    .reaction-btn span:first-child {
+      font-size: 26px;
+    }
+
+    .reaction-btn.selected {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+      color: var(--primary);
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.2);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background-color: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .form-textarea {
+      height: 80px;
+      resize: none;
+    }
+
+    /* Toast / Popups */
+    .toast {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background-color: var(--text-main);
+      color: white;
+      padding: 14px 24px;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 25%;
+      height: 100%;
+      transition: color 0.2s;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">💬</div>
+        <div class="logo-title">TalkCare</div>
+      </div>
+      <div class="user-badge" id="userBadge">TC-2026-001</div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+      
+      <!-- TAB 1: 🏠 메인 (Home) -->
+      <section id="tab-home" class="tab-view active">
+        <!-- Banner -->
+        <div class="banner">
+          <div class="banner-sub">우리 아이 언어성장 파트너</div>
+          <div class="banner-title">👋 오늘도 아이와 즐겁게<br>말을 주고받아 볼까요?</div>
+        </div>
+
+        <!-- Today's Goal Card -->
+        <div class="card goal-card">
+          <span class="goal-tag">🎯 이번 주 언어 치료 목표</span>
+          <div class="goal-text">"동작을 나타내는 말을 사용해요"<br><span style="font-size:13px; font-weight:500; color:var(--text-sub);">(동사 표현 촉진하기)</span></div>
+          <div class="target-words-box">
+            <div class="target-words-label">✨ 추천 핵심 단어:</div>
+            <div class="word-chips">
+              <span class="word-chip">먹어요</span>
+              <span class="word-chip">마셔요</span>
+              <span class="word-chip">자요</span>
+              <span class="word-chip">씻어요</span>
+              <span class="word-chip">입어요</span>
+              <span class="word-chip">열어요</span>
+              <span class="word-chip">닫아요</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="원하는 언어 목표나 단어 검색 (예: 동사, 두 단어)" onkeyup="handleSearch()">
+        </div>
+
+        <!-- Recommended Activities Section -->
+        <div class="section-header">
+          <div class="section-title">💡 오늘의 추천 활동</div>
+        </div>
+
+        <div id="homeActivityList">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </section>
+
+      <!-- TAB 2: 📚 상황별 활동 (Explore) -->
+      <section id="tab-explore" class="tab-view">
+        <div class="section-header">
+          <div class="section-title">📚 상황 및 목표별 활동 탐색</div>
+        </div>
+
+        <!-- Situation Filter -->
+        <div class="filter-group">
+          <span class="filter-label">📍 상황별 맞춤 활동</span>
+          <div class="chip-scroll" id="situationFilters">
+            <button class="filter-chip active" onclick="setFilter('situation', 'all')">전체</button>
+            <button class="filter-chip" onclick="setFilter('situation', '식사')">🏠 식사시간</button>
+            <button class="filter-chip" onclick="setFilter('situation', '목욕')">🛁 목욕시간</button>
+            <button class="filter-chip" onclick="setFilter('situation', '옷입기')">👕 옷입기</button>
+            <button class="filter-chip" onclick="setFilter('situation', '놀이')">🧸 장난감놀이</button>
+            <button class="filter-chip" onclick="setFilter('situation', '외출')">🛒 외출/마트</button>
+          </div>
+        </div>
+
+        <!-- Goal Filter -->
+        <div class="filter-group">
+          <span class="filter-label">🎯 언어 발달 목표별</span>
+          <div class="chip-scroll" id="goalFilters">
+            <button class="filter-chip active" onclick="setFilter('goal', 'all')">전체</button>
+            <button class="filter-chip" onclick="setFilter('goal', '동사 사용하기')">동사 사용하기</button>
+            <button class="filter-chip" onclick="setFilter('goal', '어휘 늘리기')">어휘 늘리기</button>
+            <button class="filter-chip" onclick="setFilter('goal', '두 단어 조합하기')">두 단어 조합</button>
+            <button class="filter-chip" onclick="setFilter('goal', '요구하기')">요구하기</button>
+            <button class="filter-chip" onclick="setFilter('goal', '거절하기')">거절하기</button>
+            <button class="filter-chip" onclick="setFilter('goal', '눈 맞추기')">눈 맞추기</button>
+          </div>
+        </div>
+
+        <div id="exploreActivityList">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </section>
+
+      <!-- TAB 3: 💡 보호자 TIP (Parent Edu) -->
+      <section id="tab-edu" class="tab-view">
+        <div class="section-header">
+          <div class="section-title">💡 언어 표현을 키우는 대화 가이드</div>
+        </div>
+
+        <!-- Edu Card 1 -->
+        <div class="edu-card">
+          <div class="edu-header">
+            <span class="edu-badge">TIP 1</span>
+            <div class="edu-title">질문 세례 대신 자연스러운 언어 전달하기</div>
+          </div>
+          <div class="comparison-box">
+            <div class="comp-item bad">
+              <span class="comp-label">❌ 지양해요:</span> "이게 뭐야?", "무슨 색이야?", "말해봐, 사과!"
+            </div>
+            <div class="comp-item good">
+              <span class="comp-label">✅ 추천해요:</span> "와! 빨간 사과네!", "사과가 사각사각 맛있어!"
+            </div>
+          </div>
+          <div class="comp-explain">
+            💡 아이에게 답을 요구하는 질문은 부담을 줄 수 있어요. 아이가 보는 상황을 보호자가 생생하게 말로 설명(모델링)해 주는 것이 훨씬 효과적입니다.
+          </div>
+        </div>
+
+        <!-- Edu Card 2 -->
+        <div class="edu-card">
+          <div class="edu-header">
+            <span class="edu-badge">TIP 2</span>
+            <div class="edu-title">아이가 말한 단어에 한 단어 더 덧붙이기</div>
+          </div>
+          <div class="comparison-box">
+            <div class="comp-item bad">
+              <span class="comp-label">❌ 지양해요:</span> 아이: "차!" → 보호자: "응." (단답형 칭찬만 하기)
+            </div>
+            <div class="comp-item good">
+              <span class="comp-label">✅ 추천해요:</span> 아이: "차!" → 보호자: "응! <b style="color:#2E7D32">빨간</b> 차 가!"
+            </div>
+          </div>
+          <div class="comp-explain">
+            💡 아이의 발화를 한 단계 확장(Expansion)하여 모델링해 주면 natural하게 문장 구성 능력이 늘어납니다.
+          </div>
+        </div>
+
+        <!-- Edu Card 3 -->
+        <div class="edu-card">
+          <div class="edu-header">
+            <span class="edu-badge">TIP 3</span>
+            <div class="edu-title">아이가 요청할 때까지 3초 기다려주기</div>
+          </div>
+          <div class="comparison-box">
+            <div class="comp-item bad">
+              <span class="comp-label">❌ 지양해요:</span> 아이가 쳐다보기만 해도 먼저 장난감이나 과자를 다 집어주기
+            </div>
+            <div class="comp-item good">
+              <span class="comp-label">✅ 추천해요:</span> 과자를 눈앞에 두고 "주세요~" 할 기회를 3초 기다려주기
+            </div>
+          </div>
+          <div class="comp-explain">
+            💡 아이가 스스로 입을 열어 표현할 시도와 시간을 주는 것이 언어 의도를 촉진하는 열쇠입니다.
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: 📊 활동 기록 (Report) -->
+      <section id="tab-report" class="tab-view">
+        <div class="section-header">
+          <div class="section-title">📊 이번 주 언어 활동 리포트</div>
+        </div>
+
+        <!-- Weekly Tracker -->
+        <div class="card">
+          <div class="card-title">🗓️ 주간 실천 현황</div>
+          <div class="weekly-tracker" id="weeklyTracker">
+            <!-- Populated dynamically JS -->
+          </div>
+        </div>
+
+        <!-- Count Summary -->
+        <div class="stat-box">
+          <div class="stat-desc">이번 주 함께 실천한 활동 횟수</div>
+          <div class="stat-number" id="weeklyCount">0회</div>
+        </div>
+
+        <!-- Logged Utterances -->
+        <div class="card">
+          <div class="card-title">📝 아이의 소중한 발화 기록</div>
+          <div class="utterance-list" id="utteranceList">
+            <!-- Populated dynamically JS -->
+          </div>
+        </div>
+
+        <!-- Encouragement Banner -->
+        <div class="banner" style="background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%); margin-bottom: 10px;">
+          <div class="banner-sub">보호자님께 드리는 응원</div>
+          <div class="banner-title" style="font-size: 17px;">"오늘도 아이의 언어 성장을 위해 한 걸음 함께해주셨어요! 정말 잘하고 계십니다 🌱"</div>
+        </div>
+
+        <!-- Clinical Disclaimer -->
+        <div class="disclaimer-box">
+          * 본 기록 및 가이드는 가정 내 언어 환경 촉진을 돕기 위한 보조용 자료이며, 언어재활사의 전문적 진단 및 치료 효과를 보장하거나 대치하지 않습니다.
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <div class="nav-item active" onclick="switchTab('home')">
+        <span class="nav-icon">🏠</span>
+        <span>메인</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('explore')">
+        <span class="nav-icon">📚</span>
+        <span>상황별 활동</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('edu')">
+        <span class="nav-icon">💡</span>
+        <span>보호자 TIP</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('report')">
+        <span class="nav-icon">📊</span>
+        <span>활동 기록</span>
+      </div>
+    </nav>
+
+    <!-- Activity Detail Modal -->
+    <div class="modal-overlay" id="activityModal">
+      <div class="modal-sheet">
+        <button class="modal-close-btn" onclick="closeModal('activityModal')">✕</button>
+        <span class="modal-tag" id="modalTag">식사시간 | 동사 사용하기</span>
+        <h2 class="modal-title" id="modalTitle">간식 먹으며 말하기</h2>
+
+        <div class="detail-section">
+          <div class="detail-section-title">🧺 준비물</div>
+          <div id="modalMaterials" style="font-size: 14px; color: var(--text-sub);">아이가 좋아하는 과자, 컵, 음료수</div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">📌 이렇게 해보세요 (단계별 가이드)</div>
+          <ol id="modalSteps" style="font-size: 14px; color: var(--text-main); padding-left: 20px; line-height: 1.6;">
+            <!-- JS populated -->
+          </ol>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">💬 보호자 실제 발화 예시 (이렇게 말해주세요)</div>
+          <div class="script-box" id="modalScript">
+            "과자 먹어요! 냠냠 맛있게 먹어요."<br>"우유 마셔요! 꼴깍꼴깍 마셔요."
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">🚀 한 단계 더 확장하기 (언어 확장)</div>
+          <div class="expansion-box" id="modalExpansion">
+            아이가 <b>"과자"</b>라고 말하면 → <b>"응! 바삭한 과자 먹어요!"</b> 라고 확장해 주세요.
+          </div>
+        </div>
+
+        <div class="tip-box">
+          💡 <b>안심 마인드 팁:</b> 아이가 즉각 반응하거나 따라 하지 않아도 괜찮아요. 귀로 듣는 수용언어가 차곡차곡 쌓이고 있는 과정입니다!
+        </div>
+
+        <button class="btn-primary" onclick="openRecordForm()">
+          <span>아이와 함께 활동 완료하기</span>
+          <span>➔</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reaction Record Modal -->
+    <div class="modal-overlay" id="recordModal">
+      <div class="modal-sheet">
+        <button class="modal-close-btn" onclick="closeModal('recordModal')">✕</button>
+        <span class="modal-tag">기록하기</span>
+        <h2 class="modal-title">아이의 반응을 기록해주세요</h2>
+
+        <!-- Reaction Picker -->
+        <div class="form-group">
+          <label class="form-label">오늘 아이의 반응은 어땠나요?</label>
+          <div class="reaction-options">
+            <div class="reaction-btn selected" onclick="selectReaction(this, '😊 잘했어요')">
+              <span>😊</span>
+              <span>잘했어요</span>
+            </div>
+            <div class="reaction-btn" onclick="selectReaction(this, '🙂 조금 어려워했어요')">
+              <span>🙂</span>
+              <span>조금 노력필요</span>
+            </div>
+            <div class="reaction-btn" onclick="selectReaction(this, '😐 도움이 필요했어요')">
+              <span>😐</span>
+              <span>힌트 필요</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utterance Input -->
+        <div class="form-group">
+          <label class="form-label">오늘 아이가 말한 단어나 소리 (선택)</label>
+          <input type="text" id="recordUtterance" class="form-input" placeholder="예) 냠냠, 먹어, 과자 줘">
+        </div>
+
+        <!-- Note Input -->
+        <div class="form-group">
+          <label class="form-label">보호자 관찰 메모</label>
+          <textarea id="recordNote" class="form-textarea" placeholder="아이의 표정이나 흥미로워했던 순간을 간단히 적어보세요."></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="saveRecord()">
+          <span>기록 저장하고 완료하기</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <span>🎉</span>
+      <span id="toastMsg">성공적으로 저장되었습니다!</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Initial Dataset
+    const activityData = [
+      {
+        id: 'act-1',
+        title: '🍎 간식 먹으며 말하기',
+        situation: '식사',
+        goal: '동사 사용하기',
+        desc: '과자와 음료를 먹으며 "먹어요, 마셔요" 표현을 자연스럽게 들려줍니다.',
+        materials: '아이가 좋아하는 과자, 음료수, 컵',
+        steps: [
+          '과자를 통에 넣고 뚜껑을 닫아 아이 눈앞에 둡니다.',
+          '아이가 관심을 보이면 과자를 하나 건네며 "먹어요!"라고 밝게 말합니다.',
+          '음료수를 줄 때도 "우유 마셔요!" 하고 동작을 말로 연결해 줍니다.'
+        ],
+        script: '"과자 먹어요! 냠냠 맛있게 먹어요."\n"우유 마셔요! 꼴깍꼴깍 마셔요."',
+        expansion: '아이가 "과자"라고 말하면 ➔ "응! 바삭한 과자 먹어요!" 라고 확장하기'
+      },
+      {
+        id: 'act-2',
+        title: '🧸 장난감 가지고 놀며 말하기',
+        situation: '놀이',
+        goal: '동사 사용하기',
+        desc: '자동차나 인형을 가지고 놀며 행동 단어(가요, 자요, 씻어요)를 촉진합니다.',
+        materials: '장난감 자동차, 아기 인형, 블록',
+        steps: [
+          '장난감 자동차를 굴리며 "차 가요! 빵빵 가요!"라고 소리냅니다.',
+          '인형을 누에 누이면서 "인형 자요~ 쿨쿨 자요"라고 동작을 표현합니다.',
+          '아이가 시늉할 때 바로 해당 동작 동사를 모델링해 줍니다.'
+        ],
+        script: '"자동차 빵빵 가요!", "인형 쿨쿨 자요~", "상자 열어요!"',
+        expansion: '아이가 "차"라고 하면 ➔ "빨간 자동차 가요!" 라고 말하기'
+      },
+      {
+        id: 'act-3',
+        title: '🛁 목욕하면서 말하기',
+        situation: '목욕',
+        goal: '동사 사용하기',
+        desc: '물놀이와 씻는 과정을 통해 "씻어요, 뿌려요, 닦아요" 표현을 배웁니다.',
+        materials: '목욕 장난감, 물조르개, 타월',
+        steps: [
+          '손을 씻겨주며 "손 씻어요! 비누로 싹싹 씻어요"라고 말합니다.',
+          '물조르개로 물을 뿌리며 "물 뿌려요! 쌕쌕 뿌려요" 해봅니다.',
+          '목욕 후 타월로 감싸며 "몸 닦아요~ 구석구석 닦아요" 표현해 줍니다.'
+        ],
+        script: '"손 씻어요~ 싹싹 씻어요!", "물 뿌려요!", "몸 닦아요!"',
+        expansion: '아이가 "물"이라고 하면 ➔ "시원한 물 뿌려요!" 라고 확장해주기'
+      },
+      {
+        id: 'act-4',
+        title: '👕 옷 입고 벗으며 말하기',
+        situation: '옷입기',
+        goal: '요구하기',
+        desc: '외출 준비 시 옷을 입고 양말을 신는 과정을 언어로 연결합니다.',
+        materials: '아이 옷, 양말, 신발',
+        steps: [
+          '양말을 손에 쥐고 아이가 발을 내밀 때까지 잠시 기다립니다.',
+          '"양말 입어요(신어요)!" "손 넣어요!" 하고 짧고 명확하게 들려줍니다.',
+          '단추나 지퍼를 올릴 때 "올려요! 쌕 올려요" 동작을 맞춰 말해줍니다.'
+        ],
+        script: '"양말 신어요!", "팔 쏙 넣어요!", "지퍼 올려요!"',
+        expansion: '아이가 "양말" 하면 ➔ "양말 주어 신어요!" 확장해주기'
+      },
+      {
+        id: 'act-5',
+        title: '🛒 마트 장보기 놀이',
+        situation: '외출',
+        goal: '어휘 늘리기',
+        desc: '카트에 과일과 물건을 담으며 사물 명사와 행동을 배웁니다.',
+        materials: '장바구니, 여러 식재료 사물',
+        steps: [
+          '사과를 카트에 담으며 "사과 담아요! 쿵 담아요" 말합니다.',
+          '두 가지 과일 중 "사과 줄까? 바나나 줄까?" 하고 고르게 유도합니다.',
+          '계산대에 올리며 "내려놓아요" 동작 표현을 들려줍니다.'
+        ],
+        script: '"사과 카트에 담아요!", "바나나 보여요!", "계산해요!"',
+        expansion: '아이가 "바나나" 하면 ➔ "노란 바나나 담아요!" 확장해주기'
+      },
+      {
+        id: 'act-6',
+        title: '📚 그림책 함께 보며 거절 및 요구하기',
+        situation: '놀이',
+        goal: '거절하기',
+        desc: '책 속 캐릭터의 행동을 보며 "싫어, 안돼, 좋아" 표현을 자연스럽게 익힙니다.',
+        materials: '아이가 좋아하는 그림책',
+        steps: [
+          '그림책 주인공이 음식 먹는 장면에서 "이거 먹을까? 싫어~ 안 먹어!" 연기하듯 말합니다.',
+          '아이가 싫어하는 그림을 가리킬 때 "싫어!"라고 대신 마음을 대변해 줍니다.',
+          '책장을 넘어갈 때 "책장 넘겨요!" 하며 함께 참여합니다.'
+        ],
+        script: '"이거 안 먹어! 싫어요!", "책장 넘겨요!", "또 봐요!"',
+        expansion: '아이가 "싫어" 하면 ➔ "이거 안 먹어, 싫어!" 문장으로 모델링'
+      }
+    ];
+
+    // State Variables
+    let currentActivity = null;
+    let selectedReaction = '😊 잘했어요';
+    let filterState = {
+      situation: 'all',
+      goal: 'all'
+    };
+
+    // DOM Loaded Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHomeActivities();
+      renderExploreActivities();
+      renderReportView();
+    });
+
+    // Navigation Tab Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      const indexMap = { home: 0, explore: 1, edu: 2, report: 3 };
+      document.querySelectorAll('.nav-item')[indexMap[tabId]].classList.add('active');
+
+      if (tabId === 'report') {
+        renderReportView();
+      }
+    }
+
+    // Render Home Activity Cards
+    function renderHomeActivities() {
+      const listEl = document.getElementById('homeActivityList');
+      const homeItems = activityData.slice(0, 3); // top 3 recommendations
+
+      listEl.innerHTML = homeItems.map(item => `
+        <div class="activity-card" onclick="openActivityModal('${item.id}')">
+          <div class="activity-icon">${getIconForSituation(item.situation)}</div>
+          <div class="activity-info">
+            <div class="activity-tags">
+              <span class="mini-tag">${item.situation}</span>
+              <span class="mini-tag">${item.goal}</span>
+            </div>
+            <div class="activity-title">${item.title}</div>
+            <div class="activity-desc">${item.desc}</div>
+          </div>
+          <div class="arrow-icon">➔</div>
+        </div>
+      `).join('');
+    }
+
+    // Render Explore Activities with Filters
+    function renderExploreActivities() {
+      const listEl = document.getElementById('exploreActivityList');
+      
+      const filtered = activityData.filter(item => {
+        const matchSit = filterState.situation === 'all' || item.situation === filterState.situation;
+        const matchGoal = filterState.goal === 'all' || item.goal === filterState.goal;
+        return matchSit && matchGoal;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">해당 조건에 맞는 활동이 없습니다. 다른 필터를 선택해보세요!</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => `
+        <div class="activity-card" onclick="openActivityModal('${item.id}')">
+          <div class="activity-icon">${getIconForSituation(item.situation)}</div>
+          <div class="activity-info">
+            <div class="activity-tags">
+              <span class="mini-tag">${item.situation}</span>
+              <span class="mini-tag">${item.goal}</span>
+            </div>
+            <div class="activity-title">${item.title}</div>
+            <div class="activity-desc">${item.desc}</div>
+          </div>
+          <div class="arrow-icon">➔</div>
+        </div>
+      `).join('');
+    }
+
+    // Filter Trigger
+    function setFilter(type, val) {
+      filterState[type] = val;
+
+      const filterContainer = document.getElementById(type === 'situation' ? 'situationFilters' : 'goalFilters');
+      filterContainer.querySelectorAll('.filter-chip').forEach(btn => {
+        if (btn.innerText.includes(val) || (val === 'all' && btn.innerText === '전체')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      renderExploreActivities();
+    }
+
+    // Search Filter
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const listEl = document.getElementById('homeActivityList');
+
+      if (!query) {
+        renderHomeActivities();
+        return;
+      }
+
+      const results = activityData.filter(item => 
+        item.title.toLowerCase().includes(query) ||
+        item.goal.toLowerCase().includes(query) ||
+        item.desc.toLowerCase().includes(query) ||
+        item.script.toLowerCase().includes(query)
+      );
+
+      if (results.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">검색 결과가 없습니다. 다른 단어로 검색해 보세요!</div>';
+        return;
+      }
+
+      listEl.innerHTML = results.map(item => `
+        <div class="activity-card" onclick="openActivityModal('${item.id}')">
+          <div class="activity-icon">${getIconForSituation(item.situation)}</div>
+          <div class="activity-info">
+            <div class="activity-tags">
+              <span class="mini-tag">${item.situation}</span>
+              <span class="mini-tag">${item.goal}</span>
+            </div>
+            <div class="activity-title">${item.title}</div>
+            <div class="activity-desc">${item.desc}</div>
+          </div>
+          <div class="arrow-icon">➔</div>
+        </div>
+      `).join('');
+    }
+
+    // Open Activity Modal
+    function openActivityModal(id) {
+      currentActivity = activityData.find(a => a.id === id);
+      if (!currentActivity) return;
+
+      document.getElementById('modalTag').innerText = `${currentActivity.situation} | ${currentActivity.goal}`;
+      document.getElementById('modalTitle').innerText = currentActivity.title;
+      document.getElementById('modalMaterials').innerText = currentActivity.materials;
+      
+      document.getElementById('modalSteps').innerHTML = currentActivity.steps.map(step => `<li>${step}</li>`).join('');
+      document.getElementById('modalScript').innerHTML = currentActivity.script.replace(/\n/g, '<br>');
+      document.getElementById('modalExpansion').innerHTML = currentActivity.expansion;
+
+      document.getElementById('activityModal').classList.add('active');
+    }
+
+    // Modal Close Helper
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Open Reaction Record Modal
+    function openRecordForm() {
+      closeModal('activityModal');
+      document.getElementById('recordModal').classList.add('active');
+    }
+
+    // Reaction Picker Selection
+    function selectReaction(btnEl, reactionText) {
+      document.querySelectorAll('.reaction-btn').forEach(btn => btn.classList.remove('selected'));
+      btnEl.classList.add('selected');
+      selectedReaction = reactionText;
+    }
+
+    // Save Record to LocalStorage
+    function saveRecord() {
+      const utterance = document.getElementById('recordUtterance').value.trim();
+      const note = document.getElementById('recordNote').value.trim();
+
+      const newRecord = {
+        id: Date.now(),
+        activityId: currentActivity ? currentActivity.id : 'custom',
+        activityTitle: currentActivity ? currentActivity.title : '자율 활동',
+        reaction: selectedReaction,
+        utterance: utterance || '등록된 말 없음',
+        note: note,
+        date: new Date().toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' }),
+        dayOfWeek: new Date().getDay() // 0(Sun) ~ 6(Sat)
+      };
+
+      let records = JSON.parse(localStorage.getItem('talkcare_records') || '[]');
+      records.unshift(newRecord);
+      localStorage.setItem('talkcare_records', JSON.stringify(records));
+
+      // Reset form
+      document.getElementById('recordUtterance').value = '';
+      document.getElementById('recordNote').value = '';
+      closeModal('recordModal');
+
+      showToast('🎉 오늘의 언어활동이 기록되었습니다!');
+      renderReportView();
+    }
+
+    // Render Tab 4 Report View
+    function renderReportView() {
+      const records = JSON.parse(localStorage.getItem('talkcare_records') || '[]');
+      
+      // Update Weekly Count
+      document.getElementById('weeklyCount').innerText = `${records.length}회`;
+
+      // Update Tracker Checklist (Mon~Sun)
+      const days = ['월', '화', '수', '목', '금', '토', '일'];
+      const dayIndexMap = [6, 0, 1, 2, 3, 4, 5]; // Sun(0)->6, Mon(1)->0...
+      
+      const activeDays = new Set();
+      records.forEach(r => {
+        const mappedIdx = dayIndexMap[r.dayOfWeek];
+        if (mappedIdx !== undefined) activeDays.add(mappedIdx);
+      });
+
+      const trackerEl = document.getElementById('weeklyTracker');
+      trackerEl.innerHTML = days.map((day, idx) => `
+        <div class="day-col">
+          <span class="day-name">${day}</span>
+          <div class="day-status ${activeDays.has(idx) ? 'done' : ''}">
+            ${activeDays.has(idx) ? '✓' : ''}
+          </div>
+        </div>
+      `).join('');
+
+      // Update Utterance List
+      const listEl = document.getElementById('utteranceList');
+      if (records.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">아직 기록된 발화가 없습니다.<br>오늘의 추천 활동을 완료하고 첫 기록을 남겨보세요!</div>';
+        return;
+      }
+
+      listEl.innerHTML = records.map(r => `
+        <div class="utterance-item">
+          <div class="utterance-date">${r.date} • ${r.activityTitle} (${r.reaction})</div>
+          <div class="utterance-text">🗣️ "${r.utterance}"</div>
+          ${r.note ? `<div class="utterance-note">📝 ${r.note}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Show Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Helper: Category Icons
+    function getIconForSituation(sit) {
+      switch(sit) {
+        case '식사': return '🍎';
+        case '목욕': return '🛁';
+        case '옷입기': return '👕';
+        case '놀이': return '🧸';
+        case '외출': return '🛒';
+        default: return '💬';
+      }
+    }
+  </script>
+</body>
+</html>
